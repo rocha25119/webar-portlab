@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+.card {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  max-width: 360px;
+  background: rgba(20, 24, 33, 0.92);
+  color: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.hidden {
+  display: none;
+}
+
+.badge {
+  display: inline-block;
+  background: #0070F3;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  background: #E53E3E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+}

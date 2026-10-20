@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>PortLab WebAR - Maqueta Portuaria</title>
+  
+  <!-- Dependencias de A-Frame y MindAR -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #info-card {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 88%;
+      max-width: 440px;
+      background: rgba(15, 23, 42, 0.95);
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 6px solid #00d2d3;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, 15px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    #card-nombre {
+      margin: 0 0 6px 0;
+      font-size: 17px;
+      color: #38bdf8;
+    }
+
+    #card-tipo-badge {
+      display: inline-block;
+      background: #0284c7;
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    #card-desc {
+      margin: 0 0 12px 0;
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: #cbd5e1;
+    }
+
+    .btn-cerrar {
+      width: 100%;
+      padding: 8px;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #hud-top {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: #f1f5f9;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      z-index: 9998;
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="hud-top">Apunta la cámara a la maqueta para ver las cápsulas</div>
+
+  <!-- Panel flotante -->
+  <div id="info-card">
+    <div id="card-tipo-badge">TIPO</div>
+    <h3 id="card-nombre">Cargando...</h3>
+    <p id="card-desc"></p>
+    <button class="btn-cerrar" onclick="document.getElementById('info-card').style.display='none'">Cerrar Cápsula</button>
+  </div>
+
+  <!-- Escena WebAR con A-Frame -->
+  <a-scene 
+    mindar-image="imageTargetSrc: ./targets.mind; filterMinCF: 0.0001; filterBeta: 0.001;" 
+    color-space="sRGB" 
+    renderer="colorManagement: true, physicallyCorrectLights" 
+    vr-mode-ui="enabled: false" 
+    device-orientation-permission-ui="enabled: false">
+    
+    <a-assets>
+      <img id="img-maqueta" src="./maqueta-portlab.png">
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .interactivo"></a-camera>
+
+    <!-- Marcador de anclaje de la maqueta -->
+    <a-entity mindar-image-target="targetIndex: 0" id="maqueta-target">
+
+      <!-- CÁPSULA 1: PIER 3 -->
+      <a-entity position="-0.22 0.32 0.06" class="interactivo" id="PIER_03">
+        <a-cylinder radius="0.008" height="0.06" color="#00d2d3" position="0 -0.03 0"></a-cylinder>
+        <a-sphere radius="0.015" color="#00d2d3" position="0 0 0"></a-sphere>
+        <a-plane width="0.22" height="0.07" color="#0f172a" material="opacity: 0.92; transparent: true" position="0 0.05 0.01">
+          <a-text value="PIER 3" align="center" color="#38bdf8" width="0.8" position="0 0.015 0.005"></a-text>
+          <a-text value="Muelle Norte" align="center" color="#94a3b8" width="0.5" position="0 -0.015 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- CÁPSULA 2: ÁREA A3 (Almacén 1) -->
+      <a-entity position="-0.12 0.16 0.06" class="interactivo" id="ALM_01">
+        <a-cylinder radius="0.008" height="0.06" color="#ff9f43" position="0 -0.03 0"></a-cylinder>
+        <a-sphere radius="0.015" color="#ff9f43" position="0 0 0"></a-sphere>
+        <a-plane width="0.22" height="0.07" color="#0f172a" material="opacity: 0.92; transparent: true" position="0 0.05 0.01">
+          <a-text value="ZONA A3" align="center" color="#fbbf24" width="0.8" position="0 0.015 0.005"></a-text>
+          <a-text value="Almacen 1" align="center" color="#94a3b8" width="0.5" position="0 -0.015 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- CÁPSULA 3: PIER 4 -->
+      <a-entity position="-0.15 -0.32 0.06" class="interactivo" id="PIER_04">
+        <a-cylinder radius="0.008" height="0.06" color="#0984e3" position="0 -0.03 0"></a-cylinder>
+        <a-sphere radius="0.015" color="#0984e3" position="0 0 0"></a-sphere>
+        <a-plane width="0.22" height="0.07" color="#0f172a" material="opacity: 0.92; transparent: true" position="0 0.05 0.01">
+          <a-text value="PIER 4" align="center" color="#38bdf8" width="0.8" position="0 0.015 0.005"></a-text>
+          <a-text value="Muelle Sur" align="center" color="#94a3b8" width="0.5" position="0 -0.015 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- CÁPSULA 4: ÁREA B4 (Almacén 2) -->
+      <a-entity position="-0.12 -0.16 0.06" class="interactivo" id="ALM_02">
+        <a-cylinder radius="0.008" height="0.06" color="#ee5253" position="0 -0.03 0"></a-cylinder>
+        <a-sphere radius="0.015" color="#ee5253" position="0 0 0"></a-sphere>
+        <a-plane width="0.22" height="0.07" color="#0f172a" material="opacity: 0.92; transparent: true" position="0 0.05 0.01">
+          <a-text value="ZONA B4" align="center" color="#f87171" width="0.8" position="0 0.015 0.005"></a-text>
+          <a-text value="Almacen 2" align="center" color="#94a3b8" width="0.5" position="0 -0.015 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- CÁPSULA 5: ZONA EXPORTACIÓN -->
+      <a-entity position="-0.02 0.00 0.05" class="interactivo" id="RUTA_DIF">
+        <a-sphere radius="0.016" color="#10ac84"></a-sphere>
+        <a-plane width="0.24" height="0.06" color="#0f172a" material="opacity: 0.92; transparent: true" position="0 0.04 0.01">
+          <a-text value="Exportacion" align="center" color="#34d399" width="0.75" position="0 0.012 0.005"></a-text>
+          <a-text value="Ruta Diferido" align="center" color="#94a3b8" width="0.5" position="0 -0.014 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- CÁPSULA 6: RETORNO Y SALIDA -->
+      <a-entity position="0.32 -0.02 0.05" class="interactivo" id="RUTA_IND">
+        <a-sphere radius="0.016" color="#fdcb6e"></a-sphere>
+        <a-plane width="0.24" height="0.06" color="#0f172a" material="opacity: 0.92; transparent: true" position="0 0.04 0.01">
+          <a-text value="Ruta Salida" align="center" color="#fbbf24" width="0.75" position="0 0.012 0.005"></a-text>
+          <a-text value="Indirecto / ZOFRI" align="center" color="#94a3b8" width="0.5" position="0 -0.014 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+    </a-entity>
+  </a-scene>
+
+  <script>
+    // En PC local: 'http://localhost:3000/api/v1/zonas'
+    // En celular con Dev Tunnels: 'https://tml0fwn4-3000.brs.devtunnels.ms/api/v1/zonas'
+    const API_URL = 'http://localhost:3000/api/v1/zonas';
+
+    // Base de datos de respaldo integrada
+    const zonasFallback = {
+      'PIER_03': {
+        nombre: 'Sitio de Atraque Pier 3',
+        tipo: 'Muelle Norte',
+        descripcion: 'Frente de atraque marítimo destinado a la descarga de naves portacontenedores y conexión directa a grúas pórtico.'
+      },
+      'PIER_04': {
+        nombre: 'Sitio de Atraque Pier 4',
+        tipo: 'Muelle Sur',
+        descripcion: 'Punto de atraque complementario habilitado para carga general y operaciones auxiliares de transferencia marítima.'
+      },
+      'ALM_01': {
+        nombre: 'Zona A3 (Almacén 1)',
+        tipo: 'Bodega de Acopio',
+        descripcion: 'Zona de recepción temporal y consolidación de carga fiscal asociada a la ruta de despacho diferido.'
+      },
+      'ALM_02': {
+        nombre: 'Zona B4 (Almacén 2)',
+        tipo: 'Patio de Contenedores',
+        descripcion: 'Instalación de almacenamiento secundario y acopio para mercancías de transferencia diferida.'
+      },
+      'RUTA_DIF': {
+        nombre: 'Ruta Diferido (Exportación)',
+        tipo: 'Flujo Logístico',
+        descripcion: 'Trayectoria operativa de carga hacia recintos de depósito previo a la tramitación de aforo y retiro.'
+      },
+      'RUTA_IND': {
+        nombre: 'Ruta Salida (Indirecto / ZOFRI)',
+        tipo: 'Flujo Logístico',
+        descripcion: 'Circuito de transferencia directa intermedia entre el frente de atraque y plataformas terrestres de salida.'
+      }
+    };
+
+    const targetEl = document.querySelector('#maqueta-target');
+    const hudTop = document.querySelector('#hud-top');
+
+    targetEl.addEventListener('targetFound', () => {
+      hudTop.innerText = 'Maqueta PortLab detectada: Toca una cápsula 3D';
+      hudTop.style.background = 'rgba(16, 185, 129, 0.85)';
+    });
+
+    targetEl.addEventListener('targetLost', () => {
+      hudTop.innerText = 'Buscando maqueta...';
+      hudTop.style.background = 'rgba(0, 0, 0, 0.7)';
+      document.getElementById('info-card').style.display = 'none';
+    });
+
+    function mostrarTarjeta(datos) {
+      document.getElementById('card-nombre').innerText = datos.nombre;
+      document.getElementById('card-tipo-badge').innerText = datos.tipo;
+      document.getElementById('card-desc').innerText = datos.descripcion;
+      document.getElementById('info-card').style.display = 'block';
+    }
+
+    document.querySelectorAll('.interactivo').forEach(el => {
+      el.addEventListener('click', () => {
+        const codigoZona = el.getAttribute('id');
+        
+        fetch(`${API_URL}/${codigoZona}`)
+          .then(res => {
+            if (!res.ok) throw new Error('Error en API');
+            return res.json();
+          })
+          .then(data => {
+            mostrarTarjeta(data);
+          })
+          .catch(err => {
+            console.warn('Backend local no alcanzado, cargando datos locales:', err);
+            if (zonasFallback[codigoZona]) {
+              mostrarTarjeta(zonasFallback[codigoZona]);
+            }
+          });
+      });
+    });
+  </script>
+</body>
+</html>
