@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>PortLab WebAR - INACAP Sede Iquique</title>
+  
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
+    #hud-top {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85); color: #38bdf8; padding: 6px 16px;
+      border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 1000;
+      border: 1px solid rgba(56, 189, 248, 0.3); backdrop-filter: blur(4px);
+    }
+    #info-card {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95); color: #f8fafc; padding: 18px;
+      border-radius: 12px; border-left: 5px solid #0284c7; width: 85%; max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; display: none;
+    }
+    #info-card h3 { margin: 0 0 6px 0; color: #38bdf8; font-size: 17px; }
+    .badge { display: inline-block; padding: 2px 8px; background: #0369a1; border-radius: 4px; font-size: 11px; margin-bottom: 8px; }
+    #info-card p { margin: 4px 0; font-size: 13px; line-height: 1.4; color: #cbd5e1; }
+    .btn-cerrar {
+      margin-top: 10px; padding: 6px 14px; background: #ef4444; color: white;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="hud-top">Enfoque la maqueta del Laboratorio PortLab</div>
+
+  <div id="info-card">
+    <h3 id="card-nombre">Cargando...</h3>
+    <span id="card-tipo" class="badge">Tipo</span>
+    <p id="card-desc"></p>
+    <button class="btn-cerrar" onclick="document.getElementById('info-card').style.display='none'">Cerrar</button>
+  </div>
+
+  <a-scene 
+    mindar-image="imageTargetSrc: ./targets.mind; filterMinCF: 0.0001; filterBeta: 0.001;" 
+    color-space="sRGB" 
+    renderer="colorManagement: true, physicallyCorrectLights" 
+    vr-mode-ui="enabled: false" 
+    device-orientation-permission-ui="enabled: false">
+
+    <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .interactivo"></a-camera>
+
+    <!-- Marcador de la maqueta física -->
+    <a-entity id="target-maqueta" mindar-image-target="targetIndex: 0">
+      
+      <!-- Cápsulas 3D Interactivas -->
+      <a-box class="interactivo" id="PIER_03" position="-0.35 0.30 0.05" scale="0.12 0.08 0.08" material="color: #0284c7; opacity: 0.9"></a-box>
+      <a-box class="interactivo" id="PIER_04" position="-0.35 -0.30 0.05" scale="0.12 0.08 0.08" material="color: #0284c7; opacity: 0.9"></a-box>
+      <a-box class="interactivo" id="ALM_01" position="-0.10 0.18 0.05" scale="0.10 0.10 0.08" material="color: #f59e0b; opacity: 0.9"></a-box>
+      <a-box class="interactivo" id="ALM_02" position="-0.10 -0.18 0.05" scale="0.10 0.10 0.08" material="color: #f59e0b; opacity: 0.9"></a-box>
+      <a-cylinder class="interactivo" id="RUTA_DIF" position="0.15 0.20 0.03" radius="0.04" height="0.02" material="color: #10b981"></a-cylinder>
+      <a-cylinder class="interactivo" id="RUTA_IND" position="0.15 -0.20 0.03" radius="0.04" height="0.02" material="color: #fdcb6e"></a-cylinder>
+
+      <!-- ANIMACIÓN RECORRIDO DE LA CARGA: Descarga de Barco -> Muelle Pier 3 -> Almacén 1 -->
+      <a-sphere id="traza-flujo-carga" position="-0.35 0.30 0.06" radius="0.02" color="#10b981"
+        animation="property: position; to: -0.10 0.18 0.06; dur: 4500; loop: true; dir: alternate; easing: easeInOutQuad">
+      </a-sphere>
+
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api/v1/zonas'; // Ajustar con URL de Render en producción
+    const targetEl = document.getElementById('target-maqueta');
+    const hudTop = document.getElementById('hud-top');
+
+    targetEl.addEventListener('targetFound', () => {
+      hudTop.innerText = 'Maqueta PortLab Detectada - Toque una cápsula para explorar';
+      hudTop.style.borderColor = '#10b981';
+      hudTop.style.color = '#34d399';
+    });
+
+    targetEl.addEventListener('targetLost', () => {
+      hudTop.innerText = 'Enfoque la maqueta del Laboratorio PortLab';
+      hudTop.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+      hudTop.style.color = '#38bdf8';
+      document.getElementById('info-card').style.display = 'none';
+    });
+
+    document.querySelectorAll('.interactivo').forEach(el => {
+      el.addEventListener('click', () => {
+        const codigo = el.getAttribute('id');
+        fetch(`${API_URL}/${codigo}`)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById('card-nombre').innerText = data.nombre;
+            document.getElementById('card-tipo').innerText = data.tipo_zona || data.tipo;
+            document.getElementById('card-desc').innerText = data.descripcion;
+            document.getElementById('info-card').style.display = 'block';
+          })
+          .catch(err => console.error('Error al consultar cápsula:', err));
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PortLab - Administración de Cápsulas</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #f8fafc; padding: 30px; }
+    .panel { background: #1e293b; max-width: 550px; margin: auto; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    h2 { margin-top: 0; color: #38bdf8; font-size: 20px; }
+    label { display: block; margin-top: 15px; font-size: 13px; color: #94a3b8; }
+    select, input, textarea { width: 100%; box-sizing: border-box; background: #0f172a; color: white; border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-top: 6px; }
+    button { margin-top: 20px; width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #0369a1; }
+    #msg { margin-top: 15px; font-size: 13px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2>Administración de Cápsulas (PortLab)</h2>
+    <label>Zona Operativa a Editar:</label>
+    <select id="sel-zona" onchange="cargarDatos()">
+      <option value="PIER_03">Pier 3</option>
+      <option value="PIER_04">Pier 4</option>
+      <option value="ALM_01">Almacén 1</option>
+      <option value="ALM_02">Almacén 2</option>
+      <option value="RUTA_DIF">Ruta Diferido</option>
+      <option value="RUTA_IND">Ruta Indirecto</option>
+    </select>
+
+    <label>Nombre Descriptivo:</label>
+    <input type="text" id="txt-nombre" placeholder="Nombre de la zona">
+
+    <label>Tipo de Zona:</label>
+    <input type="text" id="txt-tipo" placeholder="Muelle / Bodega / Flujo">
+
+    <label>Contenido de la Cápsula (Información de temporada):</label>
+    <textarea id="txt-desc" rows="5" placeholder="Descripción operativa"></textarea>
+
+    <button onclick="guardarCambios()">Guardar Cambios en Base de Datos</button>
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api/v1/zonas';
+
+    function cargarDatos() {
+      const codigo = document.getElementById('sel-zona').value;
+      fetch(`${API_URL}/${codigo}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('txt-nombre').value = data.nombre || '';
+          document.getElementById('txt-tipo').value = data.tipo_zona || '';
+          document.getElementById('txt-desc').value = data.descripcion || '';
+        });
+    }
+
+    function guardarCambios() {
+      const codigo = document.getElementById('sel-zona').value;
+      const payload = {
+        nombre: document.getElementById('txt-nombre').value,
+        tipo_zona: document.getElementById('txt-tipo').value,
+        descripcion: document.getElementById('txt-desc').value
+      };
+
+      fetch(`${API_URL}/${codigo}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        const msg = document.getElementById('msg');
+        msg.style.display = 'block';
+        msg.style.color = '#34d399';
+        msg.innerText = 'Cápsula actualizada correctamente en Supabase.';
+        setTimeout(() => { msg.style.display = 'none'; }, 3500);
+      })
+      .catch(err => alert('Error al guardar datos.'));
+    }
+
+    cargarDatos();
+  </script>
+</body>
+</html>
