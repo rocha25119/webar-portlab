@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>PortLab WebAR - INACAP Sede Iquique</title>
+  
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
+    #hud-top {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85); color: #38bdf8; padding: 6px 16px;
+      border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 1000;
+      border: 1px solid rgba(56, 189, 248, 0.3); backdrop-filter: blur(4px);
+      text-align: center; width: max-content; max-width: 90%;
+    }
+    #info-card {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95); color: #f8fafc; padding: 18px;
+      border-radius: 12px; border-left: 5px solid #0284c7; width: 85%; max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; display: none;
+    }
+    #info-card h3 { margin: 0 0 6px 0; color: #38bdf8; font-size: 17px; }
+    .badge { display: inline-block; padding: 2px 8px; background: #0369a1; border-radius: 4px; font-size: 11px; margin-bottom: 8px; }
+    #info-card p { margin: 4px 0; font-size: 13px; line-height: 1.4; color: #cbd5e1; }
+    .btn-cerrar {
+      margin-top: 10px; padding: 8px 14px; background: #ef4444; color: white;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="hud-top">Enfoque el plano de la maqueta PortLab</div>
+
+  <!-- Cápsula de Información -->
+  <div id="info-card">
+    <h3 id="card-nombre">Cargando...</h3>
+    <span id="card-tipo" class="badge">Tipo</span>
+    <p id="card-desc"></p>
+    <button class="btn-cerrar" onclick="document.getElementById('info-card').style.display='none'">Cerrar Cápsula</button>
+  </div>
+
+  <a-scene 
+    mindar-image="imageTargetSrc: ./targets.mind; filterMinCF: 0.0001; filterBeta: 0.001;" 
+    color-space="sRGB" 
+    renderer="colorManagement: true, physicallyCorrectLights" 
+    vr-mode-ui="enabled: false" 
+    device-orientation-permission-ui="enabled: false">
+
+    <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .interactivo"></a-camera>
+
+    <!-- Marcador de la maqueta física (calibrado a descarga.jpg) -->
+    <a-entity id="target-maqueta" mindar-image-target="targetIndex: 0">
+      
+      <!-- 1. PIER 3 (Arriba a la izquierda sobre el rótulo PIER 3) -->
+      <a-entity position="-0.25 0.16 0.03" class="interactivo" id="PIER_03">
+        <a-box scale="0.06 0.04 0.03" color="#0284c7"></a-box>
+        <a-plane width="0.18" height="0.05" color="#0f172a" position="0 0.045 0.01">
+          <a-text value="PIER 3" align="center" color="#38bdf8" width="0.65" position="0 0 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- 2. ALMACÉN 1 / ZONA A3 -->
+      <a-entity position="-0.15 0.08 0.03" class="interactivo" id="ALM_01">
+        <a-box scale="0.06 0.04 0.03" color="#f59e0b"></a-box>
+        <a-plane width="0.18" height="0.05" color="#0f172a" position="0 0.045 0.01">
+          <a-text value="ALMACEN 1 (A3)" align="center" color="#fbbf24" width="0.60" position="0 0 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- 3. RUTA DIFERIDO (Sobre el eje central Exportación) -->
+      <a-entity position="-0.10 0.00 0.03" class="interactivo" id="RUTA_DIF">
+        <a-cylinder radius="0.025" height="0.02" rotation="90 0 0" color="#10b981"></a-cylinder>
+        <a-plane width="0.20" height="0.05" color="#0f172a" position="0 0.04 0.01">
+          <a-text value="RUTA DIFERIDO" align="center" color="#34d399" width="0.60" position="0 0 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- 4. ALMACÉN 2 / ZONA B4 -->
+      <a-entity position="-0.15 -0.08 0.03" class="interactivo" id="ALM_02">
+        <a-box scale="0.06 0.04 0.03" color="#ef4444"></a-box>
+        <a-plane width="0.18" height="0.05" color="#0f172a" position="0 0.045 0.01">
+          <a-text value="ALMACEN 2 (B4)" align="center" color="#f87171" width="0.60" position="0 0 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- 5. PIER 4 (Abajo a la izquierda sobre el rótulo PIER 4) -->
+      <a-entity position="-0.25 -0.17 0.03" class="interactivo" id="PIER_04">
+        <a-box scale="0.06 0.04 0.03" color="#0284c7"></a-box>
+        <a-plane width="0.18" height="0.05" color="#0f172a" position="0 0.045 0.01">
+          <a-text value="PIER 4" align="center" color="#38bdf8" width="0.65" position="0 0 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- 6. RUTA INDIRECTO (Curva de salida a la derecha) -->
+      <a-entity position="0.18 -0.05 0.03" class="interactivo" id="RUTA_IND">
+        <a-cylinder radius="0.025" height="0.02" rotation="90 0 0" color="#eab308"></a-cylinder>
+        <a-plane width="0.20" height="0.05" color="#0f172a" position="0 0.04 0.01">
+          <a-text value="RUTA INDIRECTO" align="center" color="#fde047" width="0.60" position="0 0 0.005"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <!-- ANIMACIÓN RECORRIDO DE LA CARGA: Descarga Muelle -> Almacén -> Salida (OE3) -->
+      <a-sphere id="traza-flujo-carga" position="-0.25 0.16 0.04" radius="0.014" color="#10b981"
+        animation="property: position; to: 0.18 -0.05 0.04; dur: 5000; loop: true; dir: alternate; easing: easeInOutQuad">
+      </a-sphere>
+
+    </a-entity>
+  </a-scene>
+
+  <script>
+    // URL en la nube (Render) - Si pruebas en local, cambia temporalmente a 'http://localhost:3000/api/v1/zonas'
+    const API_URL = 'https://webar-portlab.onrender.com/api/v1/zonas';
+
+    // Respaldo local en caso de latencia por suspensión de Render Free Tier
+    const zonasFallback = {
+      PIER_03: { nombre: 'Sitio de Atraque Pier 3', tipo_zona: 'Muelle Norte', descripcion: 'Frente de atraque marítimo destinado a la descarga de naves portacontenedores y conexión directa a grúas pórtico.' },
+      PIER_04: { nombre: 'Sitio de Atraque Pier 4', tipo_zona: 'Muelle Sur', descripcion: 'Punto de atraque complementario habilitado para carga general y operaciones auxiliares de transferencia marítima.' },
+      ALM_01: { nombre: 'Zona A3 (Almacén 1)', tipo_zona: 'Bodega de Acopio', descripcion: 'Zona de recepción temporal y consolidación de carga fiscal asociada a la ruta de despacho diferido.' },
+      ALM_02: { nombre: 'Zona B4 (Almacén 2)', tipo_zona: 'Patio de Contenedores', descripcion: 'Instalación de almacenamiento secundario y acopio para mercancías de transferencia diferida.' },
+      RUTA_DIF: { nombre: 'Ruta Diferido (Exportación)', tipo_zona: 'Flujo Logístico', descripcion: 'Trayectoria operativa de carga hacia recintos de depósito previo a la tramitación de aforo y retiro.' },
+      RUTA_IND: { nombre: 'Ruta Salida (Indirecto / ZOFRI)', tipo_zona: 'Flujo Logístico', descripcion: 'Circuito de transferencia directa intermedia entre el frente de atraque y plataformas terrestres de salida.' }
+    };
+
+    const targetEl = document.getElementById('target-maqueta');
+    const hudTop = document.getElementById('hud-top');
+
+    targetEl.addEventListener('targetFound', () => {
+      hudTop.innerText = 'Maqueta Detectada - Toca una cápsula para ver detalles';
+      hudTop.style.borderColor = '#10b981';
+      hudTop.style.color = '#34d399';
+    });
+
+    targetEl.addEventListener('targetLost', () => {
+      hudTop.innerText = 'Enfoque el plano de la maqueta PortLab';
+      hudTop.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+      hudTop.style.color = '#38bdf8';
+      document.getElementById('info-card').style.display = 'none';
+    });
+
+    function mostrarCapsula(data) {
+      document.getElementById('card-nombre').innerText = data.nombre;
+      document.getElementById('card-tipo').innerText = data.tipo_zona || data.tipo;
+      document.getElementById('card-desc').innerText = data.descripcion;
+      document.getElementById('info-card').style.display = 'block';
+    }
+
+    document.querySelectorAll('.interactivo').forEach(el => {
+      el.addEventListener('click', () => {
+        const codigo = el.getAttribute('id');
+        fetch(`${API_URL}/${codigo}`)
+          .then(res => {
+            if (!res.ok) throw new Error('Error en servidor');
+            return res.json();
+          })
+          .then(data => mostrarCapsula(data))
+          .catch(() => {
+            if (zonasFallback[codigo]) mostrarCapsula(zonasFallback[codigo]);
+          });
+      });
+    });
+  </script>
+</body>
+</html>
